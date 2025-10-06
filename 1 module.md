@@ -16,7 +16,7 @@ systemctl restart network --now
 apt-get update && apt-get install iptables -y
 iptables -t nat -A POSTROUTING -o ens20 -s 0/0 -j MASQUERADE
 iptables-save > /etc/sysconfig/iptables
-systemctl enable –now iptables
+systemctl enable –-now iptables
 apt-get reinstall tzdata
 timedatectl set-timezone Asia/Yekaterinburg
 exec bash
