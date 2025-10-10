@@ -47,7 +47,7 @@ touch /mnt/nfs/test
 ```
 apt-get install –y chrony
 	rm -rf /etc/chrony.conf
-echo server 127.0.0.1 iburst prefer\nhwtimestamp *\nlocal stratum 5\nallow 0/0 > /etc/chrony.conf
+echo -e "server 127.0.0.1 iburst prefer\nhwtimestamp *\nlocal stratum 5\nallow 0/0" > /etc/chrony.conf
 systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc sources
