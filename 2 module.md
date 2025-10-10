@@ -8,6 +8,7 @@
 ```
 
 #Raid
+
 -- HQ-SRV
 ```tsg
 apt-get update
@@ -39,3 +40,74 @@ mount -a
 mount -v
 touch /mnt/nfs/test
 ```
+
+#Chrony
+
+-- ISP
+```
+apt-get install –y chrony
+	rm -rf /etc/chrony.conf
+echo server 127.0.0.1 iburst prefer\nhwtimestamp *\nlocal stratum 5\nallow 0/0 > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources
+chronyc tracking | grep Stratum
+
+```
+
+-- HQ-RTR
+```
+en
+	conf t
+	ntp server 172.16.1.1
+	ntp timezone utc+5
+	exit
+	write memory
+
+```
+
+
+-- BR-RTR
+```
+en
+	conf t
+	ntp server 172.16.2.1
+	ntp timezone utc+5
+	exit
+	write memory
+
+```
+
+-- HQ-CLI
+```
+apt-get install -y chrony
+echo server 172.16.1.1 iburst prefer >> /etc/chrony.conf	
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources
+timedatectl
+
+```
+
+-- HQ-SRV
+```
+apt-get install -y chrony
+echo server 172.16.1.1 iburst prefer >> /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources
+timedatectl
+
+```
+
+-- BR-SRV
+```
+apt-get install -y chrony
+echo server 172.16.2.1 iburst prefer > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources
+timedatectl
+
+```
+
