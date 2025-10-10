@@ -108,7 +108,7 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc sources
 timedatectl
-
+```
 
 # Ansible
 
@@ -139,6 +139,7 @@ Hosts:
     ansible_password: Passw0rd
     ansible_connection: network_cli
     ansible_network_os: ios
+EOF
 sed -i '11a\
 ansible_python_interpreter=/usr/bin/python3\
 interpreter_python=auto_silent\
