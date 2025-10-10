@@ -110,7 +110,9 @@ chronyc sources
 timedatectl
 
 
---
+# Ansible
+
+-- BR-SRV
 ```
 apt-get update
 apt-get install ansible -y
@@ -141,3 +143,11 @@ sed -i '11a\
 ansible_python_interpreter=/usr/bin/python3\
 interpreter_python=auto_silent\
 ansible_host_key_checking=false' /etc/ansible/ansible.cfg
+```
+
+-- HQ-CLI
+
+useradd remote_user -u 2026
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd remote_user
+sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+gpasswd -a "remote_user" wheel
