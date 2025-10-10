@@ -146,8 +146,21 @@ ansible_host_key_checking=false' /etc/ansible/ansible.cfg
 ```
 
 -- HQ-CLI
-
+```
 useradd remote_user -u 2026
 echo -e "P@ssw0rd\nP@ssw0rd" | passwd remote_user
 sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 gpasswd -a "remote_user" wheel
+echo -e "Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+systemctl restart sshd
+
+```
+
+--BR-SRV
+```
+ssh-keygen -t rsa
+ssh-copy-id -p 2026 remote_user@192.168.1.10
+ssh-copy-id -p 2026 remote_user@192.168.2.10
+ansible all -m ping
+
+```
