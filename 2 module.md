@@ -1,4 +1,4 @@
-#Samba
+# Samba
 -- BR-SRV
 ```tsh
 ```
@@ -7,7 +7,7 @@
 ```tsg
 ```
 
-#Raid
+# Raid
 
 -- HQ-SRV
 ```tsg
@@ -41,7 +41,7 @@ mount -v
 touch /mnt/nfs/test
 ```
 
-#Chrony
+# Chrony
 
 -- ISP
 ```
@@ -109,5 +109,31 @@ systemctl restart chronyd
 chronyc sources
 timedatectl
 
-```
 
+--
+```
+apt-get update
+apt-get install ansible -y
+	cat <<EOF > /etc/ansible/hosts
+Hosts:
+ hosts:
+  HQ-SRV:
+    ansible_host: 192.168.1.10
+    ansible_user: deviate_user
+    ansible_port: 2026
+  HQ-CLI:
+    ansible_host: 192.168.2.10
+    ansible_user: remote_user
+    ansible_port: 2026
+  HQ-RTR:
+    ansible_host: 192.168.1.1
+    ansible_user: net.admin
+    ansible_password: Passw0rd
+    ansible_connection: network_cli
+    ansible_network_os: ios
+  BR-RTR:
+    ansible_host: 192.168.3.1
+    ansible_user: net.admin
+    ansible_password: Passw0rd
+    ansible_connection: network_cli
+    ansible_network_os: ios
