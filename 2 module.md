@@ -144,6 +144,8 @@ sed -i '11a\
 ansible_python_interpreter=/usr/bin/python3\
 interpreter_python=auto_silent\
 ansible_host_key_checking=false' /etc/ansible/ansible.cfg
+
+ssh-keygen -t rsa
 ```
 
 -- HQ-CLI
@@ -159,7 +161,6 @@ systemctl restart sshd
 
 --BR-SRV
 ```
-ssh-keygen -t rsa
 ssh-copy-id -p 2026 remote_user@192.168.1.10
 ssh-copy-id -p 2026 remote_user@192.168.2.10
 ansible all -m ping
