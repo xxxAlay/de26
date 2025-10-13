@@ -224,3 +224,42 @@ docker compose up -d && sleep 5 && docker exec -it db mysql -u root -p'Passw0rd'
 
 ```
 
+# Web
+```
+apt-get update
+apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
+mount -o loop /dev/sr0
+systemctl enable --now httpd2 mysqld
+mysql_secure_installation << 'EOF'
+y
+P@ssw0rd
+P@ssw0rd
+y
+y
+y
+y
+EOF
+mariadb -u root -pP@ssw0rd -e "
+CREATE DATABASE webdb;
+CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
+GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost';
+FLUSH PRIVILEGES;
+"
+mkdir /tmp/tmpadd
+cp -rf /mnt/additional /tmp/tmpadd
+cp -rf /tmp/tmpadd/additional/web/dump.sql /tmp/tmpadd/additional/web/dump.sql.bak
+iconv -f UTF-16LE -t UTF-8 /tmp/tmpadd/additional/web/dump.sql -o /tmp/tmpadd/additional/web/dump_utf8.sql
+mariadb -u root -p 'P@ssw0rd' webdb < /tmp/dump_utf8.sql
+mysql -u root -p'P@ssw0rd' webdb -e "SHOW TABLES;"
+chown apache:apache /var/www/html
+chown apache:apache /var/www/webdata
+cp /tmp/tmpadd/additional/web/index.php /var/www/html/index.php
+cd /var/www/html
+cp -rf /media/ALTLinux/web/* /var/www/html
+rm -rf /var/www/html/index.html
+sed -i 's/\$username = "user";/\$username = "webc";/' /var/www/html/index.php
+sed -i 's/\$password = "password";/\$password = "P@ssw0rd";/' /var/www/html/index.php
+sed -i 's/\$dbname = "db";/\$dbname = "webdb";/' /var/www/html/index.php
+systemctl enable --now httpd2
+systemctl restart httpd2
+```
