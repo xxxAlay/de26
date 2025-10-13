@@ -161,8 +161,8 @@ systemctl restart sshd
 
 --BR-SRV
 ```
-ssh-copy-id -p 2026 remote_user@192.168.1.10
-ssh-copy-id -p 2026 remote_user@192.168.2.10
+sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 remote_user@192.168.1.10
+sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 remote_user@192.168.2.10
 ansible all -m ping
 
 ```
