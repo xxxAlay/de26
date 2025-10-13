@@ -228,8 +228,10 @@ docker compose up -d && sleep 5 && docker exec -it db mysql -u root -p'Passw0rd'
 ```
 apt-get update
 apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
+apt-get install expect -y
 mount -o loop /dev/sr0
 systemctl enable --now httpd2 mysqld
+expect << 'EOF'
 spawn mysql_secure_installation
 sleep 1
 send "\r"          ;# current password – just Enter
