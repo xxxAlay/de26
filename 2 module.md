@@ -161,8 +161,66 @@ systemctl restart sshd
 
 --BR-SRV
 ```
-sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 remote_user@192.168.1.10
-sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 remote_user@192.168.2.10
+ssh-copy-id -p 2026 remote_user@192.168.1.10
+ssh-copy-id -p 2026 remote_user@192.168.2.10
 ansible all -m ping
 
 ```
+
+
+# Docker
+-- BR-SRV
+```tcl
+apt-get update && apt-get install docker-compose docker-engine -y
+systemctl enable --now docker
+mkdir /mnt/addmount
+mount /dev/sr0 /mnt/addmount -o ro
+mount -o loop /dev/sr0
+docker load < /media/ALTLinux/docker/site_latest.tar
+docker load < /media/ALTLinux/docker/mariadb_latest.tar
+cat > docker-compose.yml << 'EOF'
+services:
+  db:
+    image: mariadb
+    container_name: db
+    environment:
+      DB_NAME: testdb
+      DB_USER: test
+      DB_PASS: Passw0rd
+      MYSQL_ROOT_PASSWORD: Passw0rd
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: test
+      MYSQL_PASSWORD: Passw0rd
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app_network
+    restart: unless-stopped
+  testapp:
+    image: site
+    container_name: testapp
+    environment:
+      DB_TYPE: maria
+      DB_HOST: db
+      DB_NAME: testdb
+      DB_USER: test
+      DB_PASS: Passw0rd
+      DB_PORT: 3306
+    ports:
+      - "8080:8000"
+    networks:
+      - app_network
+    depends_on:
+      - db
+    restart: unless-stopped
+volumes:
+  db_data:
+networks:
+  app_network:
+    driver: bridge
+EOF
+docker compose -f site.yml up -d
+docker compose up -d && sleep 5 && docker exec -it db mysql -u root -p'Passw0rd' -e "CREATE DATABASE IF NOT EXISTS testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
+
+```
+
