@@ -190,11 +190,11 @@ Hosts:
  hosts:
   HQ-SRV:
     ansible_host: 192.168.1.10
-    ansible_user: remote_user
+    ansible_user: ssh_user
     ansible_port: 2026
   HQ-CLI:
     ansible_host: 192.168.2.10
-    ansible_user: remote_user
+    ansible_user: ssh_user
     ansible_port: 2026
   HQ-RTR:
     ansible_host: 192.168.1.1
@@ -219,19 +219,19 @@ ssh-keygen -t rsa
 
 -- HQ-CLI
 ```
-useradd remote_user -u 2026
-echo -e "P@ssw0rd\nP@ssw0rd" | passwd remote_user
+useradd ssh_user -u 2026
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
 sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "remote_user" wheel
-echo -e "Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+gpasswd -a "ssh_user" wheel
+echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
 systemctl restart sshd
 
 ```
 
 --BR-SRV
 ```
-ssh-copy-id -p 2026 remote_user@192.168.1.10
-ssh-copy-id -p 2026 remote_user@192.168.2.10
+ssh-copy-id -p 2026 ssh_user@192.168.1.10
+ssh-copy-id -p 2026 ssh_user@192.168.2.10
 ansible all -m ping
 
 ```
