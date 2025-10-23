@@ -1,5 +1,12 @@
 - ISP
 ```tcl
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64 classic
+rpm [p11] http://192.168.0.222/mirror p11/branch/noarch classic
+rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64-i586 classic
+EOF
 hostnamectl set-hostname ISP
 mkdir /etc/net/ifaces/{ens20,ens21,ens22}
 echo BOOTPROTO=static > /etc/net/ifaces/ens20/options
@@ -171,6 +178,13 @@ write memory
 
 - BR-SRV
 ```tcl
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64 classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/noarch classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64-i586 classic
+EOF
 hostnamectl set-hostname br-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "DISABLED=no\nTYPE=eth\nBOOTPROTO=static\nCONFIG_IPv4=yes" > /etc/net/ifaces/ens20/options
@@ -190,6 +204,13 @@ exec bash
 
 - HQ-SRV
 ```tcl
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64 classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/noarch classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64-i586 classic
+EOF
 hostnamectl set-hostname hq-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "DISABLED=no\nTYPE=eth\nBOOTPROTO=static\nCONFIG_IPv4=yes" > /etc/net/ifaces/ens20/options
@@ -213,6 +234,13 @@ exec bash
 
 - HQ-CLI
 ```tcl
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64 classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/noarch classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64-i586 classic
+EOF
 hostnamectl set-hostname hq-cli.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "TYPE=eth\nBOOTPROTO=dhcp" > /etc/net/ifaces/ens20/options
