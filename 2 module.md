@@ -225,23 +225,11 @@ sed -i '11a\
 ansible_python_interpreter=/usr/bin/python3\
 interpreter_python=auto_silent\
 ansible_host_key_checking=false' /etc/ansible/ansible.cfg
-
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
 sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.1.10
 sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.2.10
 ansible all -m ping
 ```
-
-
-
---BR-SRV
-```
-ssh-copy-id -p 2026 sshuser@192.168.1.10
-ssh-copy-id -p 2026 sshuser@192.168.2.10
-ansible all -m ping
-
-```
-
 
 # Docker
 -- BR-SRV
