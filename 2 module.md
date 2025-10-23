@@ -184,10 +184,10 @@ timedatectl
 -- HQ-CLI
 ```
 useradd sshuser -u 2026
-echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd sshuser
 sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "ssh_user" wheel
-echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+echo -e "Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
 systemctl restart sshd
 
 ```
@@ -202,11 +202,11 @@ Hosts:
  hosts:
   HQ-SRV:
     ansible_host: 192.168.1.10
-    ansible_user: ssh_user
+    ansible_user: sshuser
     ansible_port: 2026
   HQ-CLI:
     ansible_host: 192.168.2.10
-    ansible_user: ssh_user
+    ansible_user: sshuser
     ansible_port: 2026
   HQ-RTR:
     ansible_host: 192.168.1.1
@@ -236,8 +236,8 @@ ansible all -m ping
 
 --BR-SRV
 ```
-ssh-copy-id -p 2026 ssh_user@192.168.1.10
-ssh-copy-id -p 2026 ssh_user@192.168.2.10
+ssh-copy-id -p 2026 sshuser@192.168.1.10
+ssh-copy-id -p 2026 sshuser@192.168.2.10
 ansible all -m ping
 
 ```
