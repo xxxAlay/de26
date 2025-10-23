@@ -181,6 +181,18 @@ timedatectl
 
 # Ansible
 
+-- HQ-CLI
+```
+useradd sshuser -u 2026
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
+sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+gpasswd -a "ssh_user" wheel
+echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+systemctl restart sshd
+
+```
+
+
 -- BR-SRV
 ```
 apt-get update
@@ -214,19 +226,13 @@ ansible_python_interpreter=/usr/bin/python3\
 interpreter_python=auto_silent\
 ansible_host_key_checking=false' /etc/ansible/ansible.cfg
 
-ssh-keygen -t rsa
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.1.10
+sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.2.10
+ansible all -m ping
 ```
 
--- HQ-CLI
-```
-useradd ssh_user -u 2026
-echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
-sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "ssh_user" wheel
-echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
-systemctl restart sshd
 
-```
 
 --BR-SRV
 ```
