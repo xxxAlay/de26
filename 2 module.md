@@ -222,10 +222,9 @@ Hosts:
     ansible_network_os: ios
 EOF
 sed -i '11a\
-ansible_python_interpreter=/usr/bin/python3\
-interpreter_python=auto_silent\
-ansible_host_key_checking=false' /etc/ansible/ansible.cfg
+interpreter_python=auto_silent' /etc/ansible/ansible.cfg
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+apt-get install sshpass -y
 sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.1.10
 sshpass -p 'P@ssw0rd' ssh-copy-id -o StrictHostKeyChecking=no -p 2026 sshuser@192.168.2.10
 ansible all -m ping
