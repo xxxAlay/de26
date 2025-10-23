@@ -192,11 +192,11 @@ echo 192.168.3.10/28 > /etc/net/ifaces/ens20/ipv4address
 echo default via 192.168.3.1 > /etc/net/ifaces/ens20/ipv4route
 echo nameserver 8.8.8.8 > /etc/resolv.conf
 systemctl restart network
-useradd ssh_user -u 2026
-echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
+useradd sshuser -u 2026
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd sshuser
 sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "ssh_user" wheel
-echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+echo -e "Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
 systemctl restart sshd
 exec bash
 
@@ -223,11 +223,11 @@ systemctl enable --now dnsmasq
 echo -e "no-resolv\ndomain=au-team.irpo\nserver=8.8.8.8\ninterface=*\naddress=/hq-rtr.au-team.irpo/192.168.1.1\nptr-record=1.1.168.192.in-addr.arpa,hq-rtr.au-team.irpo\naddress=/br-rtr.au-team.irpo/192.168.3.1\naddress=/hq-srv.au-team.irpo/192.168.1.10\nptr-record=10.1.168.192.in-addr.arpa,hq-srv.au-team.irpo\naddress=/hq-cli.au-team.irpo/192.168.2.10\nptr-record=10.2.168.192.in-addr.arpa,hq-cli.au-team.irpo\naddress=/br-srv.au-team.irpo/192.168.3.10\naddress=/docker.au-team.irpo/172.16.1.1\naddress=/web.au-team.irpo/172.16.2.1" >> /etc/dnsmasq.conf
 echo 192.168.1.1   hq-rtr.au-team.irpo >> /etc/hosts
 systemctl restart dnsmasq
-useradd ssh_user -u 2026
-echo -e "P@ssw0rd\nP@ssw0rd" | passwd ssh_user
+useradd sshuser -u 2026
+echo -e "P@ssw0rd\nP@ssw0rd" | passwd sshuser
 sed -i '100s/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "ssh_user" wheel
-echo -e "Port 2026\nAllowUsers ssh_user\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+echo -e "Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes" >> /etc/openssh/sshd_config
 systemctl restart sshd
 exec bash
 ```
