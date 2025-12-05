@@ -287,57 +287,106 @@ docker compose up -d && sleep 5 && docker exec -it db mysql -u root -p'Passw0rd'
 ```
 
 # Web
+
+--- HQ-SRV
 ```
-apt-get update
-apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
-apt-get install expect -y
+apt-get update && apt-get install apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-mysqli -y
 mount -o loop /dev/sr0
 systemctl enable --now httpd2 mysqld
-expect << 'EOF'
-spawn mysql_secure_installation
-sleep 1
-send "\r"          ;# current password – just Enter
-sleep 1
-send "n\r"         ;# unix_socket authentication
-sleep 1
-send "Y\r"         ;# change root password
-sleep 1
-send "P@ssw0rd\r"  ;# new password
-sleep 1
-send "P@ssw0rd\r"  ;# confirm password
-sleep 1
-send "Y\r"         ;# remove anonymous users
-sleep 1
-send "Y\r"         ;# disallow root login remotely
-sleep 1
-send "Y\r"         ;# remove test database
-sleep 1
-send "Y\r"         ;# reload privileges
-sleep 1
-expect eof
+echo -e "\n\n\n\n\nP@ssw0rd\nP@ssw0rd\n\n\n\n" | mysql_secure_installation
+mariadb -u root -pP@ssw0rd -e "CREATE DATABASE webdb; CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd'; GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost'; FLUSH PRIVILEGES;"
+iconv -f UTF-16LE -t UTF-8 /media/ALTLinux/web/dump.sql > /tmp/dump_utf8.sql
+mariadb -u root -pP@ssw0rd webdb < /tmp/dump_utf8.sql
+chmod 777 /var/www/html
+cp /media/ALTLinux/web/index.php /var/www/html
+cp /media/ALTLinux/web/logo.png /var/www/html
+rm -f /var/www/html/index.html
+chown apache2:apache2 /var/www/html
+systemctl restart httpd2
+cat <<EOF > /var/www/html/index.php
+<?php
+\$servername = "localhost";
+\$username = "webc";
+\$password = "P@ssw0rd";
+\$dbname = "webdb";
+?>
+EOF
+```
+
+
+--- HQ-CLI
+```
+systemctl restart network
+curl -I http://192.168.1.10
+```
+
+
+# Проброс портов
+
+--- HQ-RTR
+```
+en
+conf t
+ip nat source static tcp 192.168.1.10 80 172.16.1.4 8080
+ip nat source static tcp 192.168.1.10 2026 172.16.1.4 2026
+end
+wr
+```
+--- BR-RTR
+```
+en
+conf t
+ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
+ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
+end
+wr
+```
+
+
+# Nginx
+
+--- ISP
+```
+apt-get install nginx apache2-htpasswd -y
+htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
+cat > /etc/nginx/sites-available.d/proxy.conf << 'EOF'
+server {
+        listen 80;
+        server_name web.au-team.irpo;
+        auth_basic "Restricted Access";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        location / {
+                proxy_pass http://172.16.1.4:8080;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+        }
+}
+server {
+        listen 80;
+        server_name docker.au-team.irpo;
+        location / {
+                proxy_pass http://172.16.2.5:8080;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+        }
+}
 EOF
 sleep 2
-mariadb -u root -pP@ssw0rd -e "
-CREATE DATABASE webdb;
-CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
-GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost';
-FLUSH PRIVILEGES;
-"
-mkdir /tmp/tmpadd
-cp -rf /mnt/additional /tmp/tmpadd
-cp -rf /tmp/tmpadd/additional/web/dump.sql /tmp/tmpadd/additional/web/dump.sql.bak
-iconv -f UTF-16LE -t UTF-8 /tmp/tmpadd/additional/web/dump.sql -o /tmp/tmpadd/additional/web/dump_utf8.sql
-mariadb -u root -p 'P@ssw0rd' webdb < /tmp/dump_utf8.sql
-mysql -u root -p'P@ssw0rd' webdb -e "SHOW TABLES;"
-chown apache:apache /var/www/html
-chown apache:apache /var/www/webdata
-cp /tmp/tmpadd/additional/web/index.php /var/www/html/index.php
-cd /var/www/html
-cp -rf /media/ALTLinux/web/* /var/www/html
-rm -rf /var/www/html/index.html
-sed -i 's/\$username = "user";/\$username = "webc";/' /var/www/html/index.php
-sed -i 's/\$password = "password";/\$password = "P@ssw0rd";/' /var/www/html/index.php
-sed -i 's/\$dbname = "db";/\$dbname = "webdb";/' /var/www/html/index.php
-systemctl enable --now httpd2
-systemctl restart httpd2
+ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
+mv /etc/nginx/sites-avalible.d/default.conf /root/
+systemctl enable --now nginx
+```
+
+--- HQ-CLI
+```
+systemctl restart network
+curl -I http://web.au-team.irpo
+curl -I http://docker.au-team.irpo
+```
+
+# Установка Яндекс Браузера
+
+--- HQ-CLI
+```
+apt-get update && apt-get install yandex-browser -y
 ```
